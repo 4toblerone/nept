@@ -55,3 +55,7 @@ target/
 
 # PyCharm directory
 .idea/
+
+*.sqlite3
+
+neparkirajtu/settings.py
