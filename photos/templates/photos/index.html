@@ -11,5 +11,9 @@ Index page
             {{ form.as_p }}
             <input type="submit" value="Submit" />
         </form>
+
+{% for post in posts %}
+    <li><img src="{{ post.photo.url }}"/></li>
+{% endfor %}
 </body>
 </html>

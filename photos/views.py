@@ -24,18 +24,19 @@ def index(request):
                 description = form.cleaned_data['description']
                 #think about resizing to a certain size!
                 photo = form.cleaned_data['photo']
-                #create and save post, but save with status pending
+                #create and save post, but save with status pending !DONE!///
                 Post(description=description, photo=photo).save()
-                #return render(request, 'photos/index.html', {'form':form})
-                #to return clean form
-                return HttpResponseRedirect('')
+                #also return notification regarding the success or failure
+                #of post submission
+                return HttpResponseRedirect('')#to return clean form
         else:
             #if user is first time on the page
-            form = UploadForm
+            form = UploadForm()
+            posts = Post.objects.filter(status=Post.ACCEPTED)
             request.session['start_from']=0
             #increment start_from at the end
 
-    return render(request, 'photos/index.html', {'form':form})
+    return render(request, 'photos/index.html', {'form':form, 'posts':posts})
 
 def d(request):
     return HttpResponse("D")
