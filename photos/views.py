@@ -23,12 +23,19 @@ def index(request):
             if form.is_valid():
                 description = form.cleaned_data['description']
                 #think about resizing to a certain size!
+                #it has to be a photo (jpg, npg...) not some other
+                #file type
                 photo = form.cleaned_data['photo']
+
                 #create and save post, but save with status pending !DONE!///
                 Post(description=description, photo=photo).save()
                 #also return notification regarding the success or failure
                 #of post submission
                 return HttpResponseRedirect('')#to return clean form
+            else:
+                #handle badly submitted forms aka
+                #someone putted something that isn't a photo
+                return HttpResponseRedirect('')
         else:
             #if user is first time on the page
             form = UploadForm()

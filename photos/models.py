@@ -1,5 +1,11 @@
 #coding: utf-8
 from django.db import models
+from PIL import Image
+from django.core.files.images import ImageFile
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.core.files.base import ContentFile
+import StringIO
+
 # Create your models here.
 
 class Post(models.Model):
@@ -27,7 +33,10 @@ class Post(models.Model):
     description = models.CharField(max_length=200)
     #resize?
     #should i create separate field thumbnail? YES, y d fuck not
+    #also create field for original photos
     photo = models.ImageField(upload_to="photo_album")
+    original_photo = models.ImageField(upload_to="photo_album/originals", null=True, blank=True)
+    thumbnail = models.ImageField(upload_to="photo_album/thumbnails", null=True, blank=True)
     pub_date = models.DateTimeField('date published', auto_now=True)
     rating = models.IntegerField(default=0)
     status = models.SmallIntegerField(choices=STATUS , default=ACCEPTED)
@@ -36,15 +45,28 @@ class Post(models.Model):
 
     def admin_thumbnail(self):
         # think about thumbnail size
-        return u'<img src="{url}" width="100" height="100" />'.format(url=self.photo.url)
+        return u'<img src="{url}" width="200" height="150" />'.format(url=self.photo.url)
     admin_thumbnail.short_description = "Thumbnail"
     admin_thumbnail.allow_tags = True
 
+     #override Model save method with custom one
+    #which will create thumbnail before saving post
+    #should i use external lib (eg. sorl) for it?
+
+    def create_thumbnail(self, photo):
+        #create thumbnail which is  at most 200px
+        pass
+
+    def save(self):
+        #create thumbnail
+        thumb = Image.open(self.photo.file)
+        thumb_io = StringIO.StringIO()
+        thumb.save(thumb_io,format = thumb.format)
+        self.thumbnail.save(self.photo.name, ContentFile(thumb_io.getvalue()), save=False)
+        super(Post, self).save()
+
     def __unicode__(self):
         return self.description
-
-    #override Model save method with custom one
-    #which will create thumbnail before saving post
 
 # put names of city parts in a separate constants file
 # Djurinci
