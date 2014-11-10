@@ -61,18 +61,18 @@ class Post(models.Model):
         on the proportion of longer side and max_side
         """
         w, h = photo.size
-        #if photo is in la
+        #if photo is "landscape"
         if w>h:
             min_side = w/max_side*h
             photo.thumbnail((max_side,min_side), Image.ANTIALIAS)
             return photo
+        #if it's "portrait"
         else:
-            print  "usao u else"
             min_side = h/max_side*w
             photo.thumbnail((min_side,max_side), Image.ANTIALIAS)
             return photo
 
-    def _save(self,img_field, max_side, img, photo_name):
+    def _fill_img_field(self,img_field, max_side, img, photo_name):
         io = StringIO.StringIO()
         resized = self.resize(img,max_side)
         resized.save(io, format = resized.format)
@@ -80,10 +80,11 @@ class Post(models.Model):
         pass
 
     def save(self):
-        #from larger to smaller
+        #From larger to smaller cuz we are working on the same
+        #photo file. You cannot resize from smaller to bigger.
         img = Image.open(self.original_photo.file)
-        self._save(self.photo, 650, img, self.original_photo.name)
-        self._save(self.thumbnail, 200, img, self.original_photo.name)
+        self._fill_img_field(self.photo, 650, img, self.original_photo.name)
+        self._fill_img_field(self.thumbnail, 200, img, self.original_photo.name)
         super(Post, self).save()
 
     def __unicode__(self):
