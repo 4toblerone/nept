@@ -28,7 +28,7 @@ def index(request):
                 photo = form.cleaned_data['photo']
 
                 #create and save post, but save with status pending !DONE!///
-                Post(description=description, photo=photo).save()
+                Post(description=description, original_photo=photo).save()
                 #also return notification regarding the success or failure
                 #of post submission
                 return HttpResponseRedirect('')#to return clean form

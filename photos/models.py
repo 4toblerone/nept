@@ -5,6 +5,7 @@ from django.core.files.images import ImageFile
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.files.base import ContentFile
 import StringIO
+from operator import itemgetter
 
 # Create your models here.
 
@@ -45,7 +46,7 @@ class Post(models.Model):
 
     def admin_thumbnail(self):
         # think about thumbnail size
-        return u'<img src="{url}" width="200" height="150" />'.format(url=self.photo.url)
+        return u'<img src="{url}" width="200" height="150" />'.format(url=self.thumbnail.url)
     admin_thumbnail.short_description = "Thumbnail"
     admin_thumbnail.allow_tags = True
 
@@ -53,16 +54,36 @@ class Post(models.Model):
     #which will create thumbnail before saving post
     #should i use external lib (eg. sorl) for it?
 
-    def create_thumbnail(self, photo):
-        #create thumbnail which is  at most 200px
+    def resize(self, photo,max_side):
+        """
+        Resizes photo so that longer side of the photo will
+        be max_side and shorter one will be calculated based
+        on the proportion of longer side and max_side
+        """
+        w, h = photo.size
+        #if photo is in la
+        if w>h:
+            min_side = w/max_side*h
+            photo.thumbnail((max_side,min_side), Image.ANTIALIAS)
+            return photo
+        else:
+            print  "usao u else"
+            min_side = h/max_side*w
+            photo.thumbnail((min_side,max_side), Image.ANTIALIAS)
+            return photo
+
+    def _save(self,img_field, max_side, img, photo_name):
+        io = StringIO.StringIO()
+        resized = self.resize(img,max_side)
+        resized.save(io, format = resized.format)
+        img_field.save(photo_name, ContentFile(io.getvalue()), save = False)
         pass
 
     def save(self):
-        #create thumbnail
-        thumb = Image.open(self.photo.file)
-        thumb_io = StringIO.StringIO()
-        thumb.save(thumb_io,format = thumb.format)
-        self.thumbnail.save(self.photo.name, ContentFile(thumb_io.getvalue()), save=False)
+        #from larger to smaller
+        img = Image.open(self.original_photo.file)
+        self._save(self.photo, 650, img, self.original_photo.name)
+        self._save(self.thumbnail, 200, img, self.original_photo.name)
         super(Post, self).save()
 
     def __unicode__(self):
