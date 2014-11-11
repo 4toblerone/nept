@@ -28,7 +28,7 @@ def index(request):
                 photo = form.cleaned_data['photo']
 
                 #create and save post, but save with status pending !DONE!///
-                Post(description=description, original_photo=photo).save()
+                Post(description=description, original_photo=photo, ).save()
                 #also return notification regarding the success or failure
                 #of post submission
                 return HttpResponseRedirect('')#to return clean form
@@ -39,7 +39,8 @@ def index(request):
         else:
             #if user is first time on the page
             form = UploadForm()
-            posts = Post.objects.filter(status=Post.ACCEPTED)
+            #get latest Posts (doing that by putting minus sign)
+            posts = Post.objects.filter(status=Post.ACCEPTED).order_by('-pub_date')[:2]
             request.session['start_from']=0
             #increment start_from at the end
 
@@ -55,3 +56,6 @@ def return_next_posts(starting_from=0, number_of=5):
 
     posts_list = Post.objects.all().order_by('-pub_date')[starting_from:starting_from+number_of+1]
     return posts_list
+
+def city_parts(request):
+    pass
