@@ -186,6 +186,44 @@ Index page
   js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.0";
   fjs.parentNode.insertBefore(js, fjs);
 }(document, 'script', 'facebook-jssdk'));</script>
+  <script>
+$(document).ready(function(){
+	function lastAddedLiveFunc()
+	{
+		$.get("/return_next_posts/", function(data){
+            console.log(data);
+            data = JSON.parse(data);//check this out more, is it because of the content type
+            console.log(data);
+
+			if (data != "") {
+				console.log('add data..');
+                $.each(data.img_urls, function(i, item){
+                    $(".items").append(
+                      '<li><img src="'+item+'"/> <div class="fb-share-button" data-href="'+item+'" data-type="button_count"></div><br><li/> '
+                    );
+                    console.log($(".items").last());
+                    //FB.XFBML.parse($(".items").last());//not working why?
+                    FB.XFBML.parse();//working
+                });
+			}
+		});
+	};
+
+  //lastAddedLiveFunc();
+  $(window).scroll(function(){
+
+      var wintop = $(window).scrollTop(), docheight = $(document).height(), winheight = $(window).height();
+      var  scrolltrigger = 0.95;
+
+      if  ((wintop/(docheight-winheight)) > scrolltrigger) {
+         //console.log('scroll bottom');
+         //alert("peto")
+         lastAddedLiveFunc();
+      }
+  });
+});
+
+  </script>
 </head>
 <body>
 
@@ -197,13 +235,12 @@ Index page
         </form>
 
 </div>
-
+<ul class = "items">
 {% for post in posts %}
-    <li><img src="{{ post.medium_photo.url }}"/></li><br>
-    {{ post.rating }} <br>
-    <button id="{{ post.id }}">Upuj</button>
-    <div class="fb-share-button" data-href="{{ post.medium_photo.url}}" data-type="button_count"></div>
-{% endfor %}
+    <li><img src="{{ post.medium_photo.url }}"/></li><br> <br>
 
+    <div class="fb-share-button" data-href="{{ post.medium_photo.url}}" data-type="button_count"></div><br>
+{% endfor %}
+</ul>
 </body>
 </html>

@@ -4,6 +4,7 @@ from models import Post
 from django.shortcuts import  render
 from django.template import RequestContext
 from forms import UploadForm
+import json
 
 # Create your views here.
 
@@ -40,7 +41,8 @@ def index(request):
             #if user is first time on the page
             form = UploadForm()
             #get latest Posts (doing that by putting minus sign)
-            posts = Post.objects.filter(status=Post.ACCEPTED).order_by('-pub_date')[:2]
+            #negativ index slicing is not allowed while querying in Django
+            posts = Post.objects.filter(status=Post.ACCEPTED).order_by('-pub_date')#[:2]
             request.session['start_from']=0
             #increment start_from at the end
 
@@ -49,10 +51,19 @@ def index(request):
 def d(request):
     return HttpResponse("D")
 
-def return_next_posts(starting_from=0, number_of=5):
+def return_next_posts(request,starting_from=0, number_of=5):
     """should return certain batch of photos/posts
         starting_from getting from session?
     """
+    if request.is_ajax():
+        posts = Post.objects.all()[:5]
+        data = {'img_urls': [x.medium_photo.url for x in posts]}
+        result = json.dumps(data)
+        print result, "rezultat"
+        return HttpResponse(result)
+    else:
+        print "suck a dick"
+
 
     posts_list = Post.objects.all().order_by('-pub_date')[starting_from:starting_from+number_of+1]
     return posts_list
