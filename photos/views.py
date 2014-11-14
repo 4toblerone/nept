@@ -42,31 +42,45 @@ def index(request):
             form = UploadForm()
             #get latest Posts (doing that by putting minus sign)
             #negativ index slicing is not allowed while querying in Django
-            posts = Post.objects.filter(status=Post.ACCEPTED).order_by('-pub_date')#[:2]
-            request.session['start_from']=0
+            #take care of case when the number of posts is less then list_end
+            #it take cares by it self
+            list_end = 3
+            posts = Post.objects.filter(status=Post.ACCEPTED).order_by('-pub_date')[:list_end]
+            request.session['start_from']=list_end
             #increment start_from at the end
 
     return render(request, 'photos/index.html', {'form':form, 'posts':posts})
 
-def d(request):
-    return HttpResponse("D")
 
-def return_next_posts(request,starting_from=0, number_of=5):
+def return_next_posts(request, number_of=5):
     """should return certain batch of photos/posts
-        starting_from getting from session?
+        starting_from getting from session
     """
     if request.is_ajax():
-        posts = Post.objects.all()[:5]
-        data = {'img_urls': [x.medium_photo.url for x in posts]}
+        frm = request.session['start_from']
+        posts = Post.objects.filter(status=Post.ACCEPTED).order_by('-pub_date')[frm:frm+number_of]
+        #'start_from' cannot be larger than number of posts
+        #this if/else ensures that
+        end = len(posts)<=number_of
+        if end :
+            request.session['start_from']+=number_of-len(posts)
+        else:
+            request.session['start_from']+=number_of
+
+        data = {'img_urls': [x.medium_photo.url for x in posts], "end":end}
         result = json.dumps(data)
         print result, "rezultat"
         return HttpResponse(result)
-    else:
-        print "suck a dick"
 
+def get_posts(request, num_of_posts=3, order = "-pub_date"):
+    frm =  request.session['start_from']
+    posts =  posts = Post.objects.filter(status=Post.ACCEPTED).order_by(order)[frm:frm+num_of_posts]
+    #this can not be larger then the number of posts
+    request.session['start_from']+=num_of_posts
+    return posts
 
-    posts_list = Post.objects.all().order_by('-pub_date')[starting_from:starting_from+number_of+1]
-    return posts_list
+def d(request):
+    return HttpResponse("D")
 
 def city_parts(request):
     pass

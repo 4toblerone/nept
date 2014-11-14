@@ -42,6 +42,13 @@ Index page
     margin: 0;
     padding: 5px 10px;
   }
+  <!--.item {
+      width: 25%;
+  }
+  .item.w2{
+      width : 25%;
+  }-->
+
   </style>
   <script>
   (function( $ ) {
@@ -188,13 +195,14 @@ Index page
 }(document, 'script', 'facebook-jssdk'));</script>
   <script>
 $(document).ready(function(){
+    var end = false;
 	function lastAddedLiveFunc()
 	{
 		$.get("/return_next_posts/", function(data){
             console.log(data);
             data = JSON.parse(data);//check this out more, is it because of the content type
             console.log(data);
-
+            end = data.end;
 			if (data != "") {
 				console.log('add data..');
                 $.each(data.img_urls, function(i, item){
@@ -211,19 +219,36 @@ $(document).ready(function(){
 
   //lastAddedLiveFunc();
   $(window).scroll(function(){
-
+    if (end == false){
       var wintop = $(window).scrollTop(), docheight = $(document).height(), winheight = $(window).height();
       var  scrolltrigger = 0.95;
 
       if  ((wintop/(docheight-winheight)) > scrolltrigger) {
-         //console.log('scroll bottom');
-         //alert("peto")
+
          lastAddedLiveFunc();
       }
+    }
   });
 });
 
   </script>
+
+<!--<script src = "http://masonry.desandro.com/masonry.pkgd.min.js"></script>
+<script src="http://imagesloaded.desandro.com/imagesloaded.pkgd.min.js"></script>-->
+<!--<script>
+$(document).ready(function() {
+    alert("nesto se desava");
+
+    var $container = $('#container');
+// initialize Masonry after all images have loaded
+$container.imagesLoaded( function() {
+  $container.masonry();
+});
+
+    alert("nesto se desava 2 ");
+});
+</script>
+-->
 </head>
 <body>
 
@@ -237,9 +262,10 @@ $(document).ready(function(){
 </div>
 <ul class = "items">
 {% for post in posts %}
-    <li><img src="{{ post.medium_photo.url }}"/></li><br> <br>
+    <li class="item"><img  src="{{ post.medium_photo.url }}"/><br> <br>
 
     <div class="fb-share-button" data-href="{{ post.medium_photo.url}}" data-type="button_count"></div><br>
+    </li>
 {% endfor %}
 </ul>
 </body>
