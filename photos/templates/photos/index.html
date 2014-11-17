@@ -291,15 +291,16 @@ $container.imagesLoaded( function() {
 
         $('#form').submit(function(e){
             e.preventDefault();
-            console.log($("#id_photo").get());
-            console.log(new FormData($('form').get(0)));
+            //check if everything regarding field validation is ok
+            //freeze until server return response
 
+            //fill FormData with form fields
+            //refactor this
             var data = new FormData($(this));
             data.append("photo", $("#id_photo")[0].files[0]);
             data.append("description",$("#id_description").val());
             data.append("city_part",$("#id_city_part").val());
-            console.log("***********");
-            console.log($("#id_photo")[0].files);//ovo uzima fajl
+
             $.ajax({
                 url:'/',
                 type: 'POST',
@@ -316,12 +317,14 @@ $container.imagesLoaded( function() {
                 }
                 },
                 success: function(data){
-                    alert(JSON.parse(data.message));
+                    var parseData = $.parseJSON(data);
+                    console.log(parseData.message);
+                    alert(parseData.message);
                     //clear all fields
+                    //unfreeze submit button
                 }
             });
-            //e.preventDefault();
-            //return false ni ovo ne radi
+
         });
     });
 

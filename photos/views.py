@@ -20,7 +20,6 @@ def index(request):
         #if user is trying to submit new photo
         form = UploadForm(request.POST, request.FILES)
         if form.is_valid() and request.is_ajax() :
-            print "usao je u rikvest"
             description = form.cleaned_data['description']
             print description
             #think about resizing to a certain size!
@@ -29,28 +28,19 @@ def index(request):
             photo = form.cleaned_data['photo']
             #create and save post, but save with status pending !DONE!///
             #Post(description=description, original_photo=photo, ).save()
-            print "pozvao ajaxom"
             #also return notification regarding the success or failure
             #of post submission
-            return HttpResponse(json.dumps({'message':"neka poruka"}))#to return clean form
+            return HttpResponse(json.dumps({'message':"success"}))#to return clean form
         else:
             #handle badly submitted forms aka
             #someone putted something that isn't a photo
             #when called using ajax it's being recognized as invalid
             #it is required to use FormData as wrapper around form data in html
             #form_object.serialize() works only for form without file fields
-            # print "forma nije validna"
-            # print request['description']
-            #print form.cleaned_data['description'], "opis"
-            # if form.cleaned_data['photo'] is not None:
-            #     print "ima i fotka"
-            # else:
-            #     print "nema fotke"
             errors =  form.errors
             print errors
             #print "request: ", request
             return HttpResponse(json.dumps({'message':errors}))
-            #messages.error(request, "Error")
     else:
         #if user is first time on the page
         form = UploadForm()
