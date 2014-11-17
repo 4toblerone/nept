@@ -5,49 +5,63 @@ from django.shortcuts import  render
 from django.template import RequestContext
 from forms import UploadForm
 import json
-
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib import messages
 # Create your views here.
+
 
 def index(request):
     #add to session starting_from=0
     #return first 5 photos via return_next_posts
     #context = RequestContext(request, )
-    if request.is_ajax():
-        #call return_next_posts
-        #get from request  start_from
-        #increment from request start_from
-        pass
-    else:
-        if request.method == 'POST':
-            #if user is trying to submit new photo
-            form = UploadForm(request.POST, request.FILES)
-            if form.is_valid():
-                description = form.cleaned_data['description']
-                #think about resizing to a certain size!
-                #it has to be a photo (jpg, npg...) not some other
-                #file type
-                photo = form.cleaned_data['photo']
 
-                #create and save post, but save with status pending !DONE!///
-                Post(description=description, original_photo=photo, ).save()
-                #also return notification regarding the success or failure
-                #of post submission
-                return HttpResponseRedirect('')#to return clean form
-            else:
-                #handle badly submitted forms aka
-                #someone putted something that isn't a photo
-                return HttpResponseRedirect('')
+
+    if request.method  == 'POST':
+        #if user is trying to submit new photo
+        form = UploadForm(request.POST, request.FILES)
+        if form.is_valid() and request.is_ajax() :
+            print "usao je u rikvest"
+            description = form.cleaned_data['description']
+            print description
+            #think about resizing to a certain size!
+            #it has to be a photo (jpg, npg...) not some other
+            #file type
+            photo = form.cleaned_data['photo']
+            #create and save post, but save with status pending !DONE!///
+            #Post(description=description, original_photo=photo, ).save()
+            print "pozvao ajaxom"
+            #also return notification regarding the success or failure
+            #of post submission
+            return HttpResponse(json.dumps({'message':"neka poruka"}))#to return clean form
         else:
-            #if user is first time on the page
-            form = UploadForm()
-            #get latest Posts (doing that by putting minus sign)
-            #negativ index slicing is not allowed while querying in Django
-            #take care of case when the number of posts is less then list_end
-            #it take cares by it self
-            list_end = 3
-            posts = Post.objects.filter(status=Post.ACCEPTED).order_by('-pub_date')[:list_end]
-            request.session['start_from']=list_end
-            #increment start_from at the end
+            #handle badly submitted forms aka
+            #someone putted something that isn't a photo
+            #when called using ajax it's being recognized as invalid
+            #it is required to use FormData as wrapper around form data in html
+            #form_object.serialize() works only for form without file fields
+            # print "forma nije validna"
+            # print request['description']
+            #print form.cleaned_data['description'], "opis"
+            # if form.cleaned_data['photo'] is not None:
+            #     print "ima i fotka"
+            # else:
+            #     print "nema fotke"
+            errors =  form.errors
+            print errors
+            #print "request: ", request
+            return HttpResponse(json.dumps({'message':errors}))
+            #messages.error(request, "Error")
+    else:
+        #if user is first time on the page
+        form = UploadForm()
+        #get latest Posts (doing that by putting minus sign)
+        #negativ index slicing is not allowed while querying in Django
+        #take care of case when the number of posts is less then list_end
+        #it take cares by it self
+        list_end = 3
+        posts = Post.objects.filter(status=Post.ACCEPTED).order_by('-pub_date')[:list_end]
+        request.session['start_from']=list_end
+        #increment start_from at the end
 
     return render(request, 'photos/index.html', {'form':form, 'posts':posts})
 
