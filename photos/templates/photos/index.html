@@ -1,22 +1,3 @@
-<!--<!DOCTYPE html>
-<html>
-<head lang="en">
-    <meta charset="UTF-8">
-    <title>Ne parkiraj tu</title>ead>
-<body>
-Index page
-<form action="{% url 'photos:index' %}" method="post" enctype="multipart/form-data">
-			{% csrf_token %}
-            {{ form.as_p }}
-            <input type="submit" value="Submit" />
-        </form>
-
-{% for post in posts %}
-    <li><img src="{{ post.thumbnail.url }}"/></li>
-{% endfor %}
-</body>
-</html>tml>-->
-
 <!doctype html>
 <html lang="en">
 <head>
