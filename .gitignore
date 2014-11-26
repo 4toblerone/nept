@@ -59,5 +59,6 @@ target/
 *.sqlite3
 
 neparkirajtu/settings.py
+neparkirajtu/local_settings.py
 
 /media
