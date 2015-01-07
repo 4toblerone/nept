@@ -61,5 +61,5 @@ target/
 neparkirajtu/settings.py
 neparkirajtu/local_settings.py
 
-/static
+/static/images/
 /media
