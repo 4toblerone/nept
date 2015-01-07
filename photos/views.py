@@ -5,17 +5,20 @@ from django.shortcuts import  render
 from django.template import RequestContext
 from forms import UploadForm
 import json
+from django.conf import settings
+import logging
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 # Create your views here.
 
+logger = logging.getLogger(__name__)
 
 def index(request):
     #add to session starting_from=0
     #return first 5 photos via return_next_posts
     #context = RequestContext(request, )
 
-
+    print settings.CONSUMER_KEY
     if request.method  == 'POST':
         #if user is trying to submit new photo
         form = UploadForm(request.POST, request.FILES)
@@ -28,6 +31,7 @@ def index(request):
             photo = form.cleaned_data['photo']
             #create and save post, but save with status pending !DONE!///
             #Post(description=description, original_photo=photo, ).save()
+            logger.info("new photo sent")
             #also return notification regarding the success or failure
             #of post submission
             return HttpResponse(json.dumps({'message':"success"}))#to return clean form
@@ -43,6 +47,7 @@ def index(request):
             return HttpResponse(json.dumps({'message':errors}))
     else:
         #if user is first time on the page
+        logger.info("came to index page")
         form = UploadForm()
         #get latest Posts (doing that by putting minus sign)
         #negativ index slicing is not allowed while querying in Django

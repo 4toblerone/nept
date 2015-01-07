@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
+  {% load staticfiles %}
   <meta charset="utf-8">
   <title>Ne parkiraj tu</title>
   <link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
@@ -31,289 +32,26 @@
   }-->
 
   </style>
-  <script>
-  (function( $ ) {
-    $.widget( "custom.combobox", {
-      _create: function() {
-        this.wrapper = $( "<span>" )
-          .addClass( "custom-combobox" )
-          .insertAfter( this.element );
-
-        this.element.hide();
-        this._createAutocomplete();
-        this._createShowAllButton();
-      },
-
-      _createAutocomplete: function() {
-        var selected = this.element.children( ":selected" ),
-          value = selected.val() ? selected.text() : "";
-
-        this.input = $( "<input>" )
-          .appendTo( this.wrapper )
-          .val( value )
-          .attr( "title", "" )
-          .addClass( "custom-combobox-input ui-widget ui-widget-content ui-state-default ui-corner-left" )
-          .autocomplete({
-            delay: 0,
-            minLength: 0,
-            source: $.proxy( this, "_source" )
-          })
-          .tooltip({
-            tooltipClass: "ui-state-highlight"
-          });
-
-        this._on( this.input, {
-          autocompleteselect: function( event, ui ) {
-            ui.item.option.selected = true;
-            this._trigger( "select", event, {
-              item: ui.item.option
-            });
-          },
-
-          autocompletechange: "_removeIfInvalid"
-        });
-      },
-
-      _createShowAllButton: function() {
-        var input = this.input,
-          wasOpen = false;
-
-        $( "<a>" )
-          .attr( "tabIndex", -1 )
-          .attr( "title", "Show All Items" )
-          .tooltip()
-          .appendTo( this.wrapper )
-          .button({
-            icons: {
-              primary: "ui-icon-triangle-1-s"
-            },
-            text: false
-          })
-          .removeClass( "ui-corner-all" )
-          .addClass( "custom-combobox-toggle ui-corner-right" )
-          .mousedown(function() {
-            wasOpen = input.autocomplete( "widget" ).is( ":visible" );
-          })
-          .click(function() {
-            input.focus();
-
-            // Close if already visible
-            if ( wasOpen ) {
-              return;
-            }
-
-            // Pass empty string as value to search for, displaying all results
-            input.autocomplete( "search", "" );
-          });
-      },
-
-      _source: function( request, response ) {
-        var matcher = new RegExp( $.ui.autocomplete.escapeRegex(request.term), "i" );
-        response( this.element.children( "option" ).map(function() {
-          var text = $( this ).text();
-          if ( this.value && ( !request.term || matcher.test(text) ) )
-            return {
-              label: text,
-              value: text,
-              option: this
-            };
-        }) );
-      },
-
-      _removeIfInvalid: function( event, ui ) {
-
-        // Selected an item, nothing to do
-        if ( ui.item ) {
-          return;
-        }
-
-        // Search for a match (case-insensitive)
-        var value = this.input.val(),
-          valueLowerCase = value.toLowerCase(),
-          valid = false;
-        this.element.children( "option" ).each(function() {
-          if ( $( this ).text().toLowerCase() === valueLowerCase ) {
-            this.selected = valid = true;
-            return false;
-          }
-        });
-
-        // Found a match, nothing to do
-        if ( valid ) {
-          return;
-        }
-
-        // Remove invalid value
-        this.input
-          .val( "" )
-          .attr( "title", value + " didn't match any item" )
-          .tooltip( "open" );
-        this.element.val( "" );
-        this._delay(function() {
-          this.input.tooltip( "close" ).attr( "title", "" );
-        }, 2500 );
-        this.input.autocomplete( "instance" ).term = "";
-      },
-
-      _destroy: function() {
-        this.wrapper.remove();
-        this.element.show();
-      }
-    });
-  })( jQuery );
-
-  $(function() {
-    $( "#id_city_part" ).combobox();
-  });
-  </script>
-
-  <script>(function(d, s, id) {
+<!--Facebook share js -->
+<script>
+  (function(d, s, id) {
   var js, fjs = d.getElementsByTagName(s)[0];
   if (d.getElementById(id)) return;
   js = d.createElement(s); js.id = id;
   js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.0";
   fjs.parentNode.insertBefore(js, fjs);
-}(document, 'script', 'facebook-jssdk'));</script>
-  <script>
-$(document).ready(function(){
-    var end = false;
-	function lastAddedLiveFunc()
-	{
-		$.get("/return_next_posts/", function(data){
-            console.log(data);
-            data = JSON.parse(data);//check this out more, is it because of the content type
-            console.log(data);
-            end = data.end;
-			if (data != "") {
-				console.log('add data..');
-                $.each(data.img_urls, function(i, item){
-                    $(".items").append(
-                      '<li><img src="'+item+'"/> <div class="fb-share-button" data-href="'+item+'" data-type="button_count"></div><br><li/> '
-                    );
-                    console.log($(".items").last());
-                    //FB.XFBML.parse($(".items").last());//not working why?
-                    FB.XFBML.parse();//working
-                });
-			}
-		});
-	};
-
-  //lastAddedLiveFunc();
-  $(window).scroll(function(){
-    if (end == false){
-      var wintop = $(window).scrollTop(), docheight = $(document).height(), winheight = $(window).height();
-      var  scrolltrigger = 0.95;
-
-      if  ((wintop/(docheight-winheight)) > scrolltrigger) {
-
-         lastAddedLiveFunc();
-      }
-    }
-  });
-});
-
-  </script>
-
-<!--<script src = "http://masonry.desandro.com/masonry.pkgd.min.js"></script>
-<script src="http://imagesloaded.desandro.com/imagesloaded.pkgd.min.js"></script>-->
-<!--<script>
-$(document).ready(function() {
-    alert("nesto se desava");
-
-    var $container = $('#container');
-// initialize Masonry after all images have loaded
-$container.imagesLoaded( function() {
-  $container.masonry();
-});
-
-    alert("nesto se desava 2 ");
-});
+  }(document, 'script', 'facebook-jssdk'));
 </script>
--->
 
-<script>
-    $(document).ready(function(){
-
-        function getCookie(name) {
-            var cookieValue = null;
-            if (document.cookie && document.cookie != '') {
-                var cookies = document.cookie.split(';');
-                for (var i = 0; i < cookies.length; i++) {
-                var cookie = jQuery.trim(cookies[i]);
-                 // Does this cookie string begin with the name we want?
-                if (cookie.substring(0, name.length + 1) == (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-            return cookieValue;
-        }
-    var csrftoken = getCookie('csrftoken');
-
-        function csrfSafeMethod(method) {
-        // these HTTP methods do not require CSRF protection
-        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-        }
-
-    function sameOrigin(url) {
-        // test that a given url is a same-origin URL
-        // url could be relative or scheme relative or absolute
-        var host = document.location.host; // host + port
-        var protocol = document.location.protocol;
-        var sr_origin = '//' + host;
-        var origin = protocol + sr_origin;
-        // Allow absolute or scheme relative URLs to same origin
-        return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
-            (url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
-            // or any other URL that isn't scheme relative or absolute i.e relative.
-            !(/^(\/\/|http:|https:).*/.test(url));
-        }
-
-        $('#form').submit(function(e){
-            e.preventDefault();
-            //check if everything regarding field validation is ok
-            //freeze until server return response
-
-            //fill FormData with form fields
-            //refactor this
-            var data = new FormData($(this));
-            data.append("photo", $("#id_photo")[0].files[0]);
-            data.append("description",$("#id_description").val());
-            data.append("city_part",$("#id_city_part").val());
-
-            $.ajax({
-                url:'/',
-                type: 'POST',
-                data: data,//$(this).serializeArray(),//new FormData($('form')),//.append("photo",$("#id_photo").get()),
-                cache:false,
-                processData: false,
-                contentType: false, //"multipart/form-data",//false,//'application/x-www-form-urlencoded;charset=utf-8',//false ili ap ne menja nista
-                beforeSend: function(xhr, settings) {
-                    if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
-                     // Send the token to same-origin, relative URLs only.
-                     // Send the token only if the method warrants CSRF protection
-                     // Using the CSRFToken value acquired earlier
-                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
-                }
-                },
-                success: function(data){
-                    var parseData = $.parseJSON(data);
-                    console.log(parseData.message);
-                    alert(parseData.message);
-                    //clear all fields
-                    //unfreeze submit button
-                }
-            });
-
-        });
-    });
-
-
-</script>
+<!--LoadMore, AjaxUpload and ComboBox-->
+<script src="{% static "photos_app/js/LoadMore.js" %}"> </script>
+<script src="{% static "photos_app/js/AjaxUpload.js" %}"></script>
+<script src="{% static "photos_app/js/ComboBox.js" %}"></script>
 </head>
 <body>
 
+
+<img src="{% static "photos_app/images/trio.jpg" %}" />
 <div class="ui-widget">
   <form id = "form" action="{% url 'photos:index' %}" method="post" enctype="multipart/form-data">
 	    {% csrf_token %}

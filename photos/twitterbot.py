@@ -3,8 +3,11 @@ from django.conf import settings
 
 
 #find better way for import
-auth = tweepy.OAuthHandler(settings.TWITTER_CONFIG.CONSUMER_KEY, settings.TWITTER_CONFIG.CONSUMER_SECRET)
-auth.set_access_token(settings.TWITTER_CONFIG.ACCESS_KEY, settings.TWITTER_CONFIG.ACCESS_SECRET)
+
+#settings.configure()
+print settings.DEBUG
+auth = tweepy.OAuthHandler(settings.CONSUMER_KEY, settings.CONSUMER_SECRET)
+auth.set_access_token(settings.ACCESS_KEY, settings.ACCESS_SECRET)
 api = tweepy.API(auth)
 
 #api.update_status("@Ne_parkiraj_tu Yo yo yo!")
@@ -76,5 +79,5 @@ if __name__ == "__main__":
 	#pristupi fotki 
 	#print "novi tvitovi", mentions[0].entities['media']['sizes']
     print "printaj"
-    print settings.TWITTER_CONFIG.ACCESS_KEY
+    print settings.ACCESS_KEY
 	
