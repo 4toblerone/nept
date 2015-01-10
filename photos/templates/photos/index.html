@@ -50,8 +50,6 @@
 </head>
 <body>
 
-
-<img src="{% static "photos_app/images/trio.jpg" %}" />
 <div class="ui-widget">
   <form id = "form" action="{% url 'photos:index' %}" method="post" enctype="multipart/form-data">
 	    {% csrf_token %}
