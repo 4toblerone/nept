@@ -18,7 +18,7 @@ def index(request):
     #return first 5 photos via return_next_posts
     #context = RequestContext(request, )
 
-    print settings.CONSUMER_KEY
+    #print settings.CONSUMER_KEY
     if request.method  == 'POST':
         #if user is trying to submit new photo
         form = UploadForm(request.POST, request.FILES)
